@@ -172,6 +172,7 @@ def photo_picker(default_folder, default_picture):
         if event == "files_listbox":
             preview_image = os.path.join(folder, values["files_listbox"][0])
             window.find_element("image").Update(data=image.get_image_as_data(preview_image, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-ADD-":
             list_image[index_cadre] = preview_image
             if values['-4p-']:
@@ -182,6 +183,7 @@ def photo_picker(default_folder, default_picture):
             else:
                 window.find_element("assambledImage").Update(
                     data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-REM-":
             print(index_cadre)
             list_image[index_cadre] = default_pic
@@ -192,6 +194,7 @@ def photo_picker(default_folder, default_picture):
             else:
                 window.find_element("assambledImage").Update(
                     data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-NB-":
             if values['-NB-']:
                 imagefilter = 'nb'
@@ -209,21 +212,25 @@ def photo_picker(default_folder, default_picture):
                 else:
                     window.find_element("assambledImage").Update(
                         data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-1p-":
             index_cadre = 0
             list_image = [default_picture, default_picture, default_picture, default_picture]
             window.find_element("assambledImage").Update(
                 data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-4p-":
             index_cadre = 0
             list_image = [default_picture, default_picture, default_picture, default_picture]
             window.find_element("assambledImage").Update(
                 data=image.get_4_image_as_data_with_border(list_image, imagefilter, _IMAGE_L_, _IMAGE_H_))
+
         if event == "-IMPRESSION-":
             if index_cadre > 0 and values['-4p-']:
                 print_4_photo(list_image, imagefilter, window)
             else:
                 print_1_photo(list_image[0], imagefilter, window)
+                
         if event == Sg.WIN_CLOSED:
             break
 

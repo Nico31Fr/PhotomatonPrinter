@@ -80,6 +80,7 @@ def get_image_as_data(filename, width=None, height=None):
         im = im.resize((width, height))
     im_bytes = io.BytesIO()
     im.save(im_bytes, format="PNG")
+    im.close()
     return im_bytes.getvalue()
 
 
