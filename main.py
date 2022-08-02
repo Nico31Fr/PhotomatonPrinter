@@ -18,11 +18,11 @@ import image
 
 _IMAGE_FF_L_: int = 2280
 _IMAGE_FF_H_: int = 1520
-_IMAGE_L_: int = int(_IMAGE_FF_L_/4)
-_IMAGE_H_: int = int(_IMAGE_FF_H_/4)
+_IMAGE_L_: int = int(_IMAGE_FF_L_ / 4)
+_IMAGE_H_: int = int(_IMAGE_FF_H_ / 4)
 
 _FILE2PRINT_ = '/home/nicolas/PycharmProjects/PhotomatonPrinter/tmp/Image2Print.png'
-_PRINTERNAME_ = 'Canon_SELPHY_CP1300_USB_'
+_PRINTERNAME_ = 'Canon_SELPHY_CP1300_USB'
 
 
 def print_4_photo(filename, deffilter, wind):
@@ -40,12 +40,11 @@ def print_1_photo(filename, deffilter, wind):
 
 
 def startprint(wind):
-
     if os.path.isfile(_FILE2PRINT_):
         # Open a connection to cups
         conn = cups.Connection()
         printers = conn.getPrinters()
-
+        # print(printers)
         if _PRINTERNAME_ not in printers:
             print("imprimante %s non connecté" % _PRINTERNAME_)
             wind['_LOG_'].Update("imprimante %s non connecté" % _PRINTERNAME_)
@@ -76,7 +75,6 @@ def startprint(wind):
 
 
 def photo_picker(default_folder, default_picture):
-
     folder = default_folder
     preview_image = default_picture
     list_image = [default_picture, default_picture, default_picture, default_picture]
@@ -96,14 +94,15 @@ def photo_picker(default_folder, default_picture):
     files_listing = image.get_image_files_list(folder, default_picture)
 
     column1 = [[Sg.Listbox(values=files_listing,
-                change_submits=True,  # trigger an event whenever an item is selected
-                expand_y=True,
-                font=("Helvetica", 12),
-                key="files_listbox")]]
+                           change_submits=True,  # trigger an event whenever an item is selected
+                           expand_y=True,
+                           font=("Helvetica", 12),
+                           key="files_listbox")]]
 
     frame_preview = [[Sg.Image(data=image.get_image_as_data(default_picture, _IMAGE_L_, _IMAGE_H_), key="image",
                                size=(_IMAGE_L_, _IMAGE_H_))]]
-    frame_log = [[Sg.Text('Photomaton Printer Station V0.1', text_color='black', key='_LOG_', background_color='white', size=100, border_width=5, relief='groove')]]
+    frame_log = [[Sg.Text('Photomaton Printer Station V0.1', text_color='black', key='_LOG_', background_color='white',
+                          size=100, border_width=5, relief='groove')]]
 
     column2 = [
         [Sg.Image(r'./Graphics/Instruction1.png', background_color='white')],
@@ -142,9 +141,12 @@ def photo_picker(default_folder, default_picture):
     layout = [
         [
             Sg.Column(column1, background_color='white', expand_y=True),
-            Sg.Column(column2, background_color='white', element_justification='center', vertical_alignment='top', expand_y=True),
-            Sg.Column(column3, background_color='white', element_justification='center', vertical_alignment='top', expand_y=True),
-            Sg.Column(column4, background_color='white', element_justification='center', vertical_alignment='top', expand_y=True)
+            Sg.Column(column2, background_color='white', element_justification='center', vertical_alignment='top',
+                      expand_y=True),
+            Sg.Column(column3, background_color='white', element_justification='center', vertical_alignment='top',
+                      expand_y=True),
+            Sg.Column(column4, background_color='white', element_justification='center', vertical_alignment='top',
+                      expand_y=True)
         ]
     ]
 
@@ -174,24 +176,41 @@ def photo_picker(default_folder, default_picture):
             window.find_element("image").Update(data=image.get_image_as_data(preview_image, _IMAGE_L_, _IMAGE_H_))
 
         if event == "-ADD-":
-            list_image[index_cadre] = preview_image
             if values['-4p-']:
                 if index_cadre < 3:
-                    index_cadre = index_cadre + 1
+                    if list_image[index_cadre] == default_picture:
+                        list_image[index_cadre] = preview_image
+                        index_cadre = index_cadre + 1
+                    else:
+                        index_cadre = index_cadre + 1
+                        list_image[index_cadre] = preview_image
+                else:
+                    list_image[index_cadre] = preview_image
+
                 window.find_element("assambledImage").Update(
                     data=image.get_4_image_as_data_with_border(list_image, imagefilter, _IMAGE_L_, _IMAGE_H_))
             else:
+                list_image[index_cadre] = preview_image
                 window.find_element("assambledImage").Update(
                     data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
 
         if event == "-REM-":
-            print(index_cadre)
-            list_image[index_cadre] = default_pic
             if values['-4p-']:
-                index_cadre = index_cadre - 1
+                if index_cadre <= 0:
+                    index_cadre = 0
+                    list_image[index_cadre] = default_picture
+                else:
+                    if list_image[index_cadre] == default_picture:
+                        index_cadre = index_cadre - 1
+                        list_image[index_cadre] = default_picture
+                    else:
+                        list_image[index_cadre] = default_picture
+                        index_cadre = index_cadre - 1
+
                 window.find_element("assambledImage").Update(
                     data=image.get_4_image_as_data_with_border(list_image, imagefilter, _IMAGE_L_, _IMAGE_H_))
             else:
+                list_image[index_cadre] = default_picture
                 window.find_element("assambledImage").Update(
                     data=image.get_image_as_data_with_border(list_image[0], imagefilter, _IMAGE_L_, _IMAGE_H_))
 
@@ -230,7 +249,7 @@ def photo_picker(default_folder, default_picture):
                 print_4_photo(list_image, imagefilter, window)
             else:
                 print_1_photo(list_image[0], imagefilter, window)
-                
+
         if event == Sg.WIN_CLOSED:
             break
 
